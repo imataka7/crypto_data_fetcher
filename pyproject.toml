@@ -17,12 +17,10 @@ build-backend = "hatchling.build"
 
 [tool.rye]
 managed = true
-dev-dependencies = [
-    "ipykernel>=6.29.2",
-]
+dev-dependencies = ["ipykernel>=6.29.2"]
 
 [tool.hatch.metadata]
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/crypto_data_fetcher"]
+packages = ["crypto_data_fetcher"]
