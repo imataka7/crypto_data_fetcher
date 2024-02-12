@@ -1,10 +1,8 @@
 [project]
 name = "crypto_data_fetcher"
-version = "0.0.18"
-description = "crypto_data_fetcher"
-authors = [
-    { name = "richmanbtc", email = "" }
-]
+version = "0.202402.1"
+description = "fork of richmanbtc/crypto_data_fetcher"
+authors = [{ name = "imataka7", email = "takaya@umilabs.org" }]
 dependencies = [
     "ccxt>=4.2.43",
     "pandas>=2.0.3",
