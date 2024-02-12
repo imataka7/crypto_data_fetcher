@@ -69,27 +69,13 @@ class GmoFetcher:
         return df
 
     def to_ohlcv(self, df, interval_sec):
-        # df["timestamp"] = df["timestamp"].dt.floor("{}S".format(interval_sec))
-        # ohlcv = pd.concat(
-        #     [
-        #         df.groupby("timestamp")["price"].nth(0).rename("op"),
-        #         df.groupby("timestamp")["price"].max().rename("hi"),
-        #         df.groupby("timestamp")["price"].min().rename("lo"),
-        #         df.groupby("timestamp")["price"].nth(-1).rename("cl"),
-        #         df.groupby("timestamp")["size"].sum().rename("volume"),
-        #     ],
-        #     axis=1,
-        # )
         ohlcv = pd.concat(
             [
                 df.groupby("timestamp")["price"].ohlc(),
                 df.groupby("timestamp")["size"].sum().rename("volume"),
             ],
             axis=1,
-        )
-        ohlcv = ohlcv.rename(
-            columns={"open": "op", "high": "hi", "low": "lo", "close": "cl"}
-        )
+        ).rename(columns={"open": "op", "high": "hi", "low": "lo", "close": "cl"})
         return ohlcv
 
     def fetch_trades(self, market=None, interval_sec=None):
