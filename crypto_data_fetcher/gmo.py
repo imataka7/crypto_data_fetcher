@@ -69,6 +69,7 @@ class GmoFetcher:
         return df
 
     def to_ohlcv(self, df, interval_sec):
+        df["timestamp"] = df["timestamp"].dt.floor("{}s".format(interval_sec))
         ohlcv = pd.concat(
             [
                 df.groupby("timestamp")["price"].ohlc(),
