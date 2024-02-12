@@ -68,6 +68,20 @@ class GmoFetcher:
         df = self._url_read_csv(url)
         return df
 
+    def to_ohlcv(self, df, interval_sec):
+        df["timestamp"] = df["timestamp"].dt.floor("{}S".format(interval_sec))
+        ohlcv = pd.concat(
+            [
+                df.groupby("timestamp")["price"].nth(0).rename("op"),
+                df.groupby("timestamp")["price"].max().rename("hi"),
+                df.groupby("timestamp")["price"].min().rename("lo"),
+                df.groupby("timestamp")["price"].nth(-1).rename("cl"),
+                df.groupby("timestamp")["size"].sum().rename("volume"),
+            ],
+            axis=1,
+        )
+        return ohlcv
+
     def fetch_trades(self, market=None, interval_sec=None):
         if interval_sec is not None:
             if 3600 % interval_sec != 0:
@@ -79,34 +93,11 @@ class GmoFetcher:
 
         dfs = []
         while date < today:
-            # url = "https://api.coin.z.com/data/trades/{}/{}/{:02}/{}{:02}{:02}_{}.csv.gz".format(
-            #     market,
-            #     date.year,
-            #     date.month,
-            #     date.year,
-            #     date.month,
-            #     date.day,
-            #     market,
-            # )
-            # self.logger.debug(url)
-            # df = self._url_read_csv(url)
             df = self.fetch_trade_csv(market, date)
 
             if df is not None:
                 if interval_sec is not None:
-                    df["timestamp"] = df["timestamp"].dt.floor(
-                        "{}S".format(interval_sec)
-                    )
-                    df = pd.concat(
-                        [
-                            df.groupby("timestamp")["price"].nth(0).rename("op"),
-                            df.groupby("timestamp")["price"].max().rename("hi"),
-                            df.groupby("timestamp")["price"].min().rename("lo"),
-                            df.groupby("timestamp")["price"].nth(-1).rename("cl"),
-                            df.groupby("timestamp")["size"].sum().rename("volume"),
-                        ],
-                        axis=1,
-                    )
+                    df = self.to_ohlcv(df, interval_sec)
 
                 dfs.append(df)
 
